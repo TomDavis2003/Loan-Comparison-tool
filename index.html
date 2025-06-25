@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LoanSmart Pro | Accurate Loan Comparison</title>
+    <title>LoanSmart  | Accurate Loan Comparison</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -391,6 +391,9 @@
         }
 
         .comparison-result h3 {
+            color: #fff !important;
+            font-weight: 800;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.18);
             text-align: center;
             margin-bottom: 25px;
             font-size: 1.6rem;
@@ -681,8 +684,8 @@
     <div class="container">
         <header>
             <div class="logo">
-                <i class="fas fa-hand-holding-usd"></i>
-                <h1>LoanSmart Pro</h1>
+                <img src="Screenshot 2025-06-19 124543.png" alt="LoanSmart Logo" style="height: 40px;">
+                <h1>Loanitol</h1>
             </div>
             <p class="tagline">Compare loan options with accurate calculations</p>
         </header>
@@ -814,7 +817,7 @@
                 <div class="form-group">
                     <label for="editLoanAmount"><i class="fas fa-rupee-sign"></i> Loan Amount (₹)*</label>
                     <div class="input-group">
-                        <input type="number" id="editLoanAmount" placeholder="Enter loan amount" required value="0">
+                        <input type="number" id="editLoanAmount" placeholder="Enter loan amount" required value="0" step="0.01">
                         <span class="input-icon"><i class="fas fa-money-bill-wave"></i></span>
                     </div>
                 </div>
@@ -830,7 +833,7 @@
                 <div class="form-group">
                     <label for="editEmi"><i class="fas fa-wallet"></i> Monthly EMI (₹)</label>
                     <div class="input-group">
-                        <input type="number" id="editEmi" placeholder="Enter monthly EMI" value="0">
+                        <input type="number" id="editEmi" placeholder="Enter monthly EMI" value="0" step="0.01">
                         <span class="input-icon"><i class="fas fa-credit-card"></i></span>
                     </div>
                 </div>
@@ -838,7 +841,7 @@
                 <div class="form-group">
                     <label for="editTenureValue"><i class="fas fa-clock"></i> Loan Tenure</label>
                     <div class="input-group">
-                        <input type="number" id="editTenureValue" placeholder="Enter tenure" value="0">
+                        <input type="number" id="editTenureValue" placeholder="Enter tenure" value="0" step="0.01">
                     </div>
                     <div class="radio-group">
                         <div class="radio-option">
@@ -866,7 +869,7 @@
     </div>
 
     <footer class="footer">
-        <p>© 2023 LoanSmart Pro | Advanced Loan Comparison Tool | All calculations are for illustrative purposes only</p>
+        <p>© 2025 Loanitol | Advanced Loan Comparison Tool | All calculations are for illustrative purposes only</p>
     </footer>
 
     <script>
@@ -885,7 +888,6 @@
         const loanOption1Card = document.getElementById('loanOption1');
         const loanOption2Card = document.getElementById('loanOption2');
         const syncNotice1 = document.getElementById('syncNotice1');
-        const syncNotice2 = document.getElementById('syncNotice2');
         const body = document.body;
         
         // Loan options for comparison - all set to 0
@@ -1189,10 +1191,11 @@
             }
         }
         
-        // Format number with commas
+        // Format number with commas and two decimal places
         function formatNumber(num) {
             return num.toLocaleString('en-IN', {
-                maximumFractionDigits: 0
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
             });
         }
         
@@ -1213,7 +1216,7 @@
             const monthlyRate = rate / 12 / 100;
             const emi = principal * monthlyRate * Math.pow(1 + monthlyRate, months) / 
                         (Math.pow(1 + monthlyRate, months) - 1);
-            return Math.round(emi);
+            return parseFloat(emi.toFixed(2));
         }
         
         function calculateTenure(principal, rate, emi) {
@@ -1275,7 +1278,7 @@
                 if (balance <= 0) break;
             }
             
-            return Math.round(totalInterest);
+            return parseFloat(totalInterest.toFixed(2));
         }
     </script>
 </body>
