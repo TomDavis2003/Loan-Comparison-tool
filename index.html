@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoanSmart Pro | Accurate Loan Comparison</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --success: #2ec4b6;
+            --warning: #ff9f1c;
+            --danger: #e71d36;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --savings: #2ec4b6;
+            --loss: #e71d36;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--dark);
+            padding: 20px;
+            line-height: 1.6;
+            transition: background 0.5s ease;
+        }
+        
+        body.savings-theme {
+            background: linear-gradient(135deg, #e8f7f6 0%, #d1f0ed 100%);
+        }
+        
+        body.loss-theme {
+            background: linear-gradient(135deg, #fce8e8 0%, #f9dada 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .logo i {
+            font-size: 2.8rem;
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            color: var(--gray);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 35px;
+            margin-bottom: 30px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            transition: var(--transition);
+        }
+        
+        .card.savings-card:before {
+            background: linear-gradient(90deg, var(--success) 0%, #24a99a 100%);
+        }
+        
+        .card.loss-card:before {
+            background: linear-gradient(90deg, var(--danger) 0%, #c9162d 100%);
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            color: var(--secondary);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card-title i {
+            background: rgba(67, 97, 238, 0.1);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .savings-theme .card-title i {
+            background: rgba(46, 196, 182, 0.15);
+            color: var(--success);
+        }
+        
+        .loss-theme .card-title i {
+            background: rgba(231, 29, 54, 0.15);
+            color: var(--danger);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            background: #f8fafc;
+            font-weight: 500;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1.2rem;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 25px;
+            margin-top: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .radio-option input {
+            width: auto;
+            transform: scale(1.2);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(67, 97, 238, 0.35);
+        }
+
+        .btn i {
+            font-size: 1.3rem;
+        }
+
+        .btn-block {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: #eef2ff;
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-success:hover {
+            background: #24a99a;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+        }
+
+        .btn-warning:hover {
+            background: #e68a00;
+        }
+        
+        .btn-loss {
+            background: var(--loss);
+        }
+        
+        .btn-loss:hover {
+            background: #c9162d;
+        }
+
+        .comparison-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .loan-card {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            transition: var(--transition);
+            position: relative;
+            border: 2px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .loan-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .loan-card.savings-card {
+            border-color: var(--success);
+        }
+        
+        .loan-card.loss-card {
+            border-color: var(--danger);
+        }
+
+        .loan-card h3 {
+            text-align: center;
+            color: var(--secondary);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f5f9;
+            font-size: 1.5rem;
+        }
+        
+        .savings-card h3 {
+            color: var(--success);
+        }
+        
+        .loss-card h3 {
+            color: var(--danger);
+        }
+
+        .loan-details {
+            flex: 1;
+        }
+
+        .loan-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .loan-detail:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 1.15rem;
+            text-align: right;
+            min-width: 120px;
+        }
+        
+        .savings-card .detail-value {
+            color: var(--success);
+        }
+        
+        .loss-card .detail-value {
+            color: var(--danger);
+        }
+
+        .comparison-result {
+            flex: 0 0 300px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .comparison-result.savings-result {
+            background: linear-gradient(135deg, var(--success) 0%, #24a99a 100%);
+        }
+        
+        .comparison-result.loss-result {
+            background: linear-gradient(135deg, var(--danger) 0%, #c9162d 100%);
+        }
+
+        .comparison-result h3 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .difference {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .positive {
+            color: #90e0ef;
+        }
+        
+        .savings-result .positive {
+            color: #b0f4e8;
+        }
+        
+        .loss-result .positive {
+            color: #ffd1dc;
+        }
+
+        .negative {
+            color: #ffafcc;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 20px 20px;
+            color: var(--gray);
+            font-size: 1rem;
+            margin-top: auto;
+        }
+
+        .info-text {
+            background: #eef2ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 1.05rem;
+            color: #4b5563;
+            border-left: 4px solid var(--accent);
+        }
+
+        .info-text i {
+            color: var(--accent);
+            margin-right: 10px;
+            font-size: 1.3rem;
+        }
+
+        .edit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        .modal-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            justify-content: flex-end;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--success);
+            color: white;
+            padding: 18px 30px;
+            border-radius: 10px;
+            box-shadow: var(--box-shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification i {
+            font-size: 1.8rem;
+        }
+        
+        .card-footer {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .edit-emi-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            margin-left: 8px;
+            font-size: 1rem;
+        }
+        
+        .result-alert {
+            text-align: center;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: var(--primary);
+        }
+        
+        .savings-alert {
+            background: linear-gradient(135deg, var(--success) 0%, #24a99a 100%);
+            color: white;
+        }
+        
+        .loss-alert {
+            background: linear-gradient(135deg, var(--danger) 0%, #c9162d 100%);
+            color: white;
+        }
+        
+        .edit-loan-btn {
+            background: var(--primary);
+            color: white;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+        
+        .edit-loan-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #ffd700;
+            top: -10px;
+            opacity: 0;
+            z-index: 1000;
+        }
+        
+        .auto-sync-notice {
+            background: rgba(67, 97, 238, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--primary);
+            text-align: center;
+            margin-top: 10px;
+            border: 1px dashed var(--primary);
+            display: none;
+        }
+        
+        .auto-sync-notice.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-container {
+                flex-direction: column;
+            }
+            
+            .comparison-result {
+                order: 1;
+            }
+            
+            .logo h1 {
+                font-size: 2rem;
+            }
+
+            .card {
+                padding: 25px 20px;
+            }
+            
+            .result-alert {
+                font-size: 1.2rem;
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-hand-holding-usd"></i>
+                <h1>LoanSmart Pro</h1>
+            </div>
+            <p class="tagline">Compare loan options with accurate calculations</p>
+        </header>
+
+        <!-- Loan Comparison -->
+        <div id="comparisonPage" class="page active">
+            <div class="card" id="comparisonCard">
+                <h2 class="card-title"><i class="fas fa-balance-scale"></i> Loan Comparison</h2>
+                
+                <!-- Result Alert Banner -->
+                <div id="resultAlert" class="result-alert">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Enter loan details to see your comparison results!</span>
+                </div>
+                
+                <div class="comparison-container">
+                    <!-- Current Loan on LEFT -->
+                    <div class="loan-card" id="loanOption2">
+                        <h3>Current Loan</h3>
+                        <div class="loan-details">
+                            <div class="loan-detail">
+                                <span class="detail-label">Loan Amount:</span>
+                                <span class="detail-value" id="opt2Amount">₹0</span>
+                            </div>
+                            <div class="loan-detail">
+                                <span class="detail-label">Interest Rate:</span>
+                                <span class="detail-value" id="opt2Rate">0%</span>
+                            </div>
+                            <div class="loan-detail">
+                                <span class="detail-label">Tenure:</span>
+                                <span class="detail-value" id="opt2Tenure">0 years</span>
+                            </div>
+                            <div class="loan-detail">
+                                <span class="detail-label">Monthly EMI:</span>
+                                <span class="detail-value">
+                                    <span id="opt2Emi">₹0</span>
+                                </span>
+                            </div>
+                            <div class="loan-detail">
+                                <span class="detail-label">Total Interest:</span>
+                                <span class="detail-value" id="opt2Interest">₹0</span>
+                            </div>
+                            <div class="loan-detail">
+                                <span class="detail-label">Total Payment:</span>
+                                <span class="detail-value" id="opt2Total">₹0</span>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button class="edit-loan-btn" id="editLoan2Btn">
+                                <i class="fas fa-edit"></i> Edit Loan
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Comparison Results -->
+                    <div class="comparison-result" id="comparisonResult">
+                        <h3><i class="fas fa-exchange-alt"></i> Comparison</h3>
+                        <div class="result-item">
+                            <span>EMI Difference:</span>
+                            <span class="difference">₹0/month</span>
+                        </div>
+                        <div class="result-item">
+                            <span>Interest Saved:</span>
+                            <span class="difference">₹0</span>
+                        </div>
+                        <div class="result-item">
+                            <span>Tenure Difference:</span>
+                            <span class="difference">0 months</span>
+                        </div>
+                        <div class="result-item">
+                            <span>Total Savings:</span>
+                            <span class="difference">₹0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Current Loan on RIGHT -->
+                    <div class="loan-card" id="loanOption1">
+                        <h3>Alternative Loan</h3>
+                        <div class="loan-details">
+                            <div class="loan-detail">
+                                <span class="detail-label">Loan Amount:</span>
+                                <span class="detail-value" id="opt1Amount">₹0</span>
+                            </div>
+                            <div class="loan-detail">
+                                <span class="detail-label">Interest Rate:</span>
+                                <span class="detail-value" id="opt1Rate">0%</span>
+                            </div>
+                            <div class="loan-detail">
+                                <span class="detail-label">Tenure:</span>
+                                <span class="detail-value" id="opt1Tenure">0 years</span>
+                            </div>
+                            <div class="loan-detail">
+                                <span class="detail-label">Monthly EMI:</span>
+                                <span class="detail-value">
+                                    <span id="opt1Emi">₹0</span>
+                                </span>
+                            </div>
+                            <div class="loan-detail">
+                                <span class="detail-label">Total Interest:</span>
+                                <span class="detail-value" id="opt1Interest">₹0</span>
+                            </div>
+                            <div class="loan-detail">
+                                <span class="detail-label">Total Payment:</span>
+                                <span class="detail-value" id="opt1Total">₹0</span>
+                            </div>
+                        </div>
+                        <div class="auto-sync-notice" id="syncNotice1">
+                            <i class="fas fa-sync-alt"></i> Loan amount auto-synced to Current Loan
+                        </div>
+                        <div class="card-footer">
+                            <button class="edit-loan-btn" id="editLoan1Btn">
+                                <i class="fas fa-edit"></i> Edit Loan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Loan Modal -->
+    <div class="edit-modal" id="loanEditModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="loanModalTitle">Edit Loan Details</h3>
+                <button class="close-modal" id="closeLoanModal">&times;</button>
+            </div>
+            <div class="modal-form">
+                <div class="form-group">
+                    <label for="editLoanAmount"><i class="fas fa-rupee-sign"></i> Loan Amount (₹)*</label>
+                    <div class="input-group">
+                        <input type="number" id="editLoanAmount" placeholder="Enter loan amount" required value="0">
+                        <span class="input-icon"><i class="fas fa-money-bill-wave"></i></span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editInterestRate"><i class="fas fa-percent"></i> Annual Interest Rate (%)</label>
+                    <div class="input-group">
+                        <input type="number" id="editInterestRate" placeholder="Enter interest rate" step="0.01" value="0">
+                        <span class="input-icon"><i class="fas fa-chart-line"></i></span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editEmi"><i class="fas fa-wallet"></i> Monthly EMI (₹)</label>
+                    <div class="input-group">
+                        <input type="number" id="editEmi" placeholder="Enter monthly EMI" value="0">
+                        <span class="input-icon"><i class="fas fa-credit-card"></i></span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editTenureValue"><i class="fas fa-clock"></i> Loan Tenure</label>
+                    <div class="input-group">
+                        <input type="number" id="editTenureValue" placeholder="Enter tenure" value="0">
+                    </div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="editMonths" name="editTenureType" value="months">
+                            <label for="editMonths">Months</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="editYears" name="editTenureType" value="years" checked>
+                            <label for="editYears">Years</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="cancelLoanEdit">Cancel</button>
+                <button class="btn btn-success" id="saveLoanChanges">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span>Loan details updated successfully!</span>
+    </div>
+
+    <footer class="footer">
+        <p>© 2023 LoanSmart Pro | Advanced Loan Comparison Tool | All calculations are for illustrative purposes only</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const notification = document.getElementById('notification');
+        const resultAlert = document.getElementById('resultAlert');
+        const loanEditModal = document.getElementById('loanEditModal');
+        const closeLoanModal = document.getElementById('closeLoanModal');
+        const cancelLoanEdit = document.getElementById('cancelLoanEdit');
+        const saveLoanChanges = document.getElementById('saveLoanChanges');
+        const editLoan1Btn = document.getElementById('editLoan1Btn');
+        const editLoan2Btn = document.getElementById('editLoan2Btn');
+        const loanModalTitle = document.getElementById('loanModalTitle');
+        const comparisonCard = document.getElementById('comparisonCard');
+        const comparisonResult = document.getElementById('comparisonResult');
+        const loanOption1Card = document.getElementById('loanOption1');
+        const loanOption2Card = document.getElementById('loanOption2');
+        const syncNotice1 = document.getElementById('syncNotice1');
+        const syncNotice2 = document.getElementById('syncNotice2');
+        const body = document.body;
+        
+        // Loan options for comparison - all set to 0
+        let loanOption1 = {
+            amount: 0,
+            rate: 0,
+            tenureMonths: 0,
+            emi: 0,
+            edited: false
+        };
+        
+        let loanOption2 = {
+            amount: 0,
+            rate: 0,
+            tenureMonths: 0,
+            emi: 0,
+            edited: false
+        };
+        
+        // Current editing loan
+        let currentEditLoan = null;
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up event listeners
+            closeLoanModal.addEventListener('click', closeEditLoanModal);
+            cancelLoanEdit.addEventListener('click', closeEditLoanModal);
+            saveLoanChanges.addEventListener('click', saveLoanChangesHandler);
+            editLoan1Btn.addEventListener('click', () => openEditLoanModal(1));
+            editLoan2Btn.addEventListener('click', () => openEditLoanModal(2));
+            
+            // Update comparison page with initial data
+            updateComparisonPage();
+        });
+        
+        // Update comparison page with loan data
+        function updateComparisonPage() {
+            // Calculate totals for option 1
+            const totalInterest1 = calculateTotalInterest(loanOption1.amount, loanOption1.rate, loanOption1.tenureMonths, loanOption1.emi);
+            const totalPayment1 = loanOption1.amount + totalInterest1;
+            
+            // Calculate totals for option 2
+            const totalInterest2 = calculateTotalInterest(loanOption2.amount, loanOption2.rate, loanOption2.tenureMonths, loanOption2.emi);
+            const totalPayment2 = loanOption2.amount + totalInterest2;
+            
+            // Format tenure for display
+            const formatTenure = (months) => {
+                if (months <= 0) return "0 months";
+                
+                const years = Math.floor(months / 12);
+                const remainingMonths = months % 12;
+                let display = "";
+                if (years > 0) display += `${years} year${years > 1 ? 's' : ''}`;
+                if (remainingMonths > 0) {
+                    if (years > 0) display += " ";
+                    display += `${remainingMonths} month${remainingMonths > 1 ? 's' : ''}`;
+                }
+                return display;
+            };
+            
+            // Update Option 1 (Current Loan)
+            document.getElementById('opt1Amount').textContent = `₹${formatNumber(loanOption1.amount)}`;
+            document.getElementById('opt1Rate').textContent = `${loanOption1.rate.toFixed(2)}%`;
+            document.getElementById('opt1Tenure').textContent = formatTenure(loanOption1.tenureMonths);
+            document.getElementById('opt1Emi').textContent = `₹${formatNumber(loanOption1.emi)}`;
+            document.getElementById('opt1Interest').textContent = `₹${formatNumber(totalInterest1)}`;
+            document.getElementById('opt1Total').textContent = `₹${formatNumber(totalPayment1)}`;
+            
+            // Update Option 2 (Current Loan)
+            document.getElementById('opt2Amount').textContent = `₹${formatNumber(loanOption2.amount)}`;
+            document.getElementById('opt2Rate').textContent = `${loanOption2.rate.toFixed(2)}%`;
+            document.getElementById('opt2Tenure').textContent = formatTenure(loanOption2.tenureMonths);
+            document.getElementById('opt2Emi').textContent = `₹${formatNumber(loanOption2.emi)}`;
+            document.getElementById('opt2Interest').textContent = `₹${formatNumber(totalInterest2)}`;
+            document.getElementById('opt2Total').textContent = `₹${formatNumber(totalPayment2)}`;
+            
+            // Update comparison results
+            const emiDiff = loanOption1.emi - loanOption2.emi;
+            const interestDiff = totalInterest1 - totalInterest2;
+            const tenureDiff = loanOption1.tenureMonths - loanOption2.tenureMonths;
+            const totalSavings = totalPayment1 - totalPayment2;
+            
+            // Reset theme classes
+            body.classList.remove('savings-theme', 'loss-theme');
+            comparisonCard.classList.remove('savings-card', 'loss-card');
+            comparisonResult.classList.remove('savings-result', 'loss-result');
+            loanOption1Card.classList.remove('savings-card', 'loss-card');
+            loanOption2Card.classList.remove('savings-card', 'loss-card');
+            
+            // Update alert message based on savings/loss
+            if (loanOption1.amount > 0 && loanOption2.amount > 0) {
+                if (totalSavings < 0) {
+                    // Savings scenario
+                    resultAlert.className = "result-alert savings-alert";
+                    resultAlert.innerHTML = `
+                        <i class="fas fa-trophy"></i>
+                        <span>Congratulations! You save ₹${formatNumber(Math.abs(totalSavings))} with Alternative Loan!</span>
+                        <i class="fas fa-smile-beam"></i>
+                    `;
+                    
+                    // Apply green theme
+                    body.classList.add('savings-theme');
+                    comparisonCard.classList.add('savings-card');
+                    comparisonResult.classList.add('savings-result');
+                    loanOption1Card.classList.add('savings-card');
+                    loanOption2Card.classList.add('loss-card');
+                    
+                    createConfetti();
+                } else if (totalSavings > 0) {
+                    // Loss scenario
+                    resultAlert.className = "result-alert loss-alert";
+                    resultAlert.innerHTML = `
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Warning! Alternative Loan costs ₹${formatNumber(totalSavings)} more.</span>
+                        <i class="fas fa-frown"></i>
+                    `;
+                    
+                    // Apply red theme
+                    body.classList.add('loss-theme');
+                    comparisonCard.classList.add('loss-card');
+                    comparisonResult.classList.add('loss-result');
+                    loanOption1Card.classList.add('loss-card');
+                    loanOption2Card.classList.add('savings-card');
+                } else {
+                    // Equal scenario
+                    resultAlert.className = "result-alert";
+                    resultAlert.innerHTML = `
+                        <i class="fas fa-balance-scale"></i>
+                        <span>Both loans have the same total cost!</span>
+                    `;
+                }
+            } else {
+                // No data scenario
+                resultAlert.className = "result-alert";
+                resultAlert.innerHTML = `
+                    <i class="fas fa-info-circle"></i>
+                    <span>Enter loan details to see your comparison results!</span>
+                `;
+            }
+            
+            // Update comparison results
+            const emiDiffElement = document.querySelectorAll('.difference')[0];
+            const interestDiffElement = document.querySelectorAll('.difference')[1];
+            const tenureDiffElement = document.querySelectorAll('.difference')[2];
+            const totalDiffElement = document.querySelectorAll('.difference')[3];
+            
+            // Set styles based on savings/loss
+            const emiClass = emiDiff < 0 ? "positive" : "negative";
+            const interestClass = interestDiff < 0 ? "positive" : "negative";
+            const tenureClass = tenureDiff < 0 ? "negative" : "positive";
+            const totalClass = totalSavings < 0 ? "positive" : "negative";
+            
+            // Set content
+            emiDiffElement.innerHTML = emiDiff === 0 ? 
+                `<span>₹0/month</span>` :
+                `<span class="${emiClass}">${emiDiff < 0 ? '+' : ''}₹${formatNumber(Math.abs(emiDiff))}/month</span>`;
+                
+            interestDiffElement.innerHTML = interestDiff === 0 ?
+                `<span>₹0</span>` :
+                `<span class="${interestClass}">${interestDiff < 0 ? '+' : ''}₹${formatNumber(Math.abs(interestDiff))}</span>`;
+                
+            tenureDiffElement.innerHTML = tenureDiff === 0 ?
+                `<span>0 months</span>` :
+                `<span class="${tenureClass}">${tenureDiff > 0 ? '+' : ''}${Math.abs(tenureDiff)} months</span>`;
+                
+            totalDiffElement.innerHTML = totalSavings === 0 ?
+                `<span>₹0</span>` :
+                `<span class="${totalClass}">${totalSavings < 0 ? '+' : ''}₹${formatNumber(Math.abs(totalSavings))}</span>`;
+            
+            // Update labels based on savings/loss
+            const totalLabel = totalSavings < 0 ? "Total Savings:" : "Total Loss:";
+            document.querySelectorAll('.result-item')[3].querySelector('span:first-child').textContent = 
+                totalSavings === 0 ? "Difference:" : totalLabel;
+        }
+        
+        // Open edit loan modal
+        function openEditLoanModal(loanId) {
+            currentEditLoan = loanId;
+            const loan = loanId === 1 ? loanOption1 : loanOption2;
+            
+            // Fill form with current values
+            document.getElementById('editLoanAmount').value = loan.amount;
+            document.getElementById('editInterestRate').value = loan.rate;
+            document.getElementById('editEmi').value = loan.emi;
+            
+            // Set tenure value and type
+            if (loan.tenureMonths >= 12) {
+                document.getElementById('editTenureValue').value = Math.floor(loan.tenureMonths / 12);
+                document.getElementById('editYears').checked = true;
+            } else if (loan.tenureMonths > 0) {
+                document.getElementById('editTenureValue').value = loan.tenureMonths;
+                document.getElementById('editMonths').checked = true;
+            } else {
+                document.getElementById('editTenureValue').value = 0;
+                document.getElementById('editYears').checked = true;
+            }
+            
+            // Update modal title
+            loanModalTitle.textContent = `Edit ${loanId === 1 ? 'Current' : 'Alternative'} Loan`;
+            
+            // Show modal
+            loanEditModal.classList.add('active');
+        }
+        
+        // Close edit loan modal
+        function closeEditLoanModal() {
+            loanEditModal.classList.remove('active');
+        }
+        
+        // Save loan changes
+        function saveLoanChangesHandler() {
+            if (!currentEditLoan) return;
+            
+            const loan = currentEditLoan === 1 ? loanOption1 : loanOption2;
+            const otherLoan = currentEditLoan === 1 ? loanOption2 : loanOption1;
+            
+            // Get values from modal
+            const amount = parseFloat(document.getElementById('editLoanAmount').value) || 0;
+            let rate = parseFloat(document.getElementById('editInterestRate').value) || 0;
+            let emi = parseFloat(document.getElementById('editEmi').value) || 0;
+            let tenureValue = parseFloat(document.getElementById('editTenureValue').value) || 0;
+            const tenureType = document.querySelector('input[name="editTenureType"]:checked').value;
+            
+            // Validate inputs
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid loan amount.');
+                return;
+            }
+            
+            // Convert tenure to months if in years
+            if (tenureType === 'years') {
+                tenureValue = tenureValue * 12;
+            }
+            
+            // Count how many parameters are provided
+            const providedParams = [rate, emi, tenureValue].filter(val => val > 0).length;
+            
+            if (providedParams < 2) {
+                alert('Please provide at least two of the following: Interest Rate, EMI, or Tenure.');
+                return;
+            }
+            
+            // Update loan amount
+            loan.amount = amount;
+            
+            // Auto-sync loan amount to other loan if it hasn't been edited yet
+            if (!otherLoan.edited && otherLoan.amount === 0) {
+                otherLoan.amount = amount;
+                document.getElementById(`syncNotice${currentEditLoan}`).classList.add('show');
+                setTimeout(() => {
+                    document.getElementById(`syncNotice${currentEditLoan}`).classList.remove('show');
+                }, 3000);
+            }
+            
+            // Calculate missing parameter
+            if (rate > 0 && tenureValue > 0 && emi <= 0) {
+                // Calculate EMI if rate and tenure are provided
+                emi = calculateEMI(amount, rate, tenureValue);
+            } else if (rate > 0 && emi > 0 && tenureValue <= 0) {
+                // Calculate tenure if rate and EMI are provided
+                tenureValue = calculateTenure(amount, rate, emi);
+            } else if (emi > 0 && tenureValue > 0 && rate <= 0) {
+                // Calculate rate if EMI and tenure are provided
+                rate = calculateRate(amount, emi, tenureValue);
+            }
+            
+            // Update loan properties
+            loan.rate = rate;
+            loan.emi = emi;
+            loan.tenureMonths = tenureValue;
+            
+            // Mark loan as edited
+            loan.edited = true;
+            
+            // Update the display
+            updateComparisonPage();
+            
+            // Close modal and show notification
+            closeEditLoanModal();
+            showNotification('Loan details updated successfully!');
+        }
+        
+        // Create confetti animation for savings
+        function createConfetti() {
+            const colors = ['#ffd700', '#ff6b6b', '#48dbfb', '#1dd1a1', '#f368e0'];
+            const container = document.body;
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animation = `confetti ${Math.random() * 3 + 2}s ease-out forwards`;
+                confetti.style.opacity = '1';
+                container.appendChild(confetti);
+                
+                // Remove after animation completes
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+        
+        // Format number with commas
+        function formatNumber(num) {
+            return num.toLocaleString('en-IN', {
+                maximumFractionDigits: 0
+            });
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            notification.querySelector('span').textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Loan calculation functions
+        function calculateEMI(principal, rate, months) {
+            if (months === 0 || rate === 0) return 0;
+            
+            const monthlyRate = rate / 12 / 100;
+            const emi = principal * monthlyRate * Math.pow(1 + monthlyRate, months) / 
+                        (Math.pow(1 + monthlyRate, months) - 1);
+            return Math.round(emi);
+        }
+        
+        function calculateTenure(principal, rate, emi) {
+            if (rate === 0 || emi === 0) return 0;
+            
+            const monthlyRate = rate / 12 / 100;
+            if (emi <= principal * monthlyRate) {
+                // EMI is too low to cover even interest
+                return 0;
+            }
+            const tenure = Math.log(emi / (emi - principal * monthlyRate)) / 
+                          Math.log(1 + monthlyRate);
+            return Math.ceil(tenure);
+        }
+        
+        function calculateRate(principal, emi, months) {
+            if (emi === 0 || months === 0) return 0;
+            
+            // Use iterative method for better accuracy
+            let low = 0;
+            let high = 100;
+            let rate = (low + high) / 2;
+            let precision = 0.01;
+            let calculatedEMI = 0;
+            
+            for (let i = 0; i < 100; i++) {
+                calculatedEMI = calculateEMI(principal, rate, months);
+                
+                if (Math.abs(calculatedEMI - emi) < precision) {
+                    break;
+                }
+                
+                if (calculatedEMI < emi) {
+                    low = rate;
+                } else {
+                    high = rate;
+                }
+                
+                rate = (low + high) / 2;
+            }
+            
+            return parseFloat(rate.toFixed(2));
+        }
+        
+        function calculateTotalInterest(principal, rate, months, emi) {
+            if (principal === 0 || months === 0) return 0;
+            
+            // Calculate total interest more accurately
+            let balance = principal;
+            let totalInterest = 0;
+            const monthlyRate = rate / 12 / 100;
+            
+            for (let i = 0; i < months; i++) {
+                const monthlyInterest = balance * monthlyRate;
+                balance -= (emi - monthlyInterest);
+                totalInterest += monthlyInterest;
+                
+                // Stop calculation if balance is paid off
+                if (balance <= 0) break;
+            }
+            
+            return Math.round(totalInterest);
+        }
+    </script>
+</body>
+</html>
