@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LoanSmart  | Accurate Loan Comparison</title>
+    <title>Loanitol  | Accurate Loan Comparison</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
     <style>
         :root {
             --primary: #4361ee;
@@ -435,6 +438,11 @@
             color: #ffafcc;
         }
 
+        /* NEW: Consistent color for differences in savings theme */
+        .savings-result .negative {
+            color: #b0f4e8;
+        }
+
         .footer {
             text-align: center;
             padding: 30px 20px 20px;
@@ -678,13 +686,129 @@
                 text-align: center;
             }
         }
+        
+        /* New styles for report section */
+        .report-section {
+            margin-top: 40px;
+            text-align: center;
+            padding: 25px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .report-btn {
+            background: linear-gradient(135deg, #ff9f1c 0%, #ff7f00 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(255, 159, 28, 0.3);
+        }
+        
+        .report-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 159, 28, 0.4);
+        }
+        
+        .report-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .report-modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .report-modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        
+        .report-modal-title {
+            font-size: 1.8rem;
+            color: var(--warning);
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .report-info {
+            background: #fff8e6;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            text-align: center;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .report-form-group {
+            margin-bottom: 20px;
+        }
+        
+        .report-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+            text-align: left;
+        }
+        
+        .report-form-group input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+        
+        .report-form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+        }
+        
+        .report-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <div class="logo">
-                <img src="Screenshot 2025-06-19 124543.png" alt="LoanSmart Logo" style="height: 40px;">
+                <img src="Screenshot 2025-06-19 124543.png" alt="Loanitol Logo" style="height: 40px;">
                 <h1>Loanitol</h1>
             </div>
             <p class="tagline">Compare loan options with accurate calculations</p>
@@ -745,10 +869,10 @@
                         <h3><i class="fas fa-exchange-alt"></i> Comparison</h3>
                         <div class="result-item">
                             <span>EMI Difference:</span>
-                            <span class="difference">₹0/month</span>
+                            <span class="difference">₹0 /month</span>
                         </div>
                         <div class="result-item">
-                            <span>Interest Saved:</span>
+                            <span>Interest Difference:</span>
                             <span class="difference">₹0</span>
                         </div>
                         <div class="result-item">
@@ -802,6 +926,19 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            
+            <!-- New Report Section -->
+            <div class="report-section">
+                <p style="font-size: 1.2rem; margin-bottom: 15px;">
+                    <i class="fas fa-info-circle"></i> Want a detailed report with advantages/disadvantages of both loans?
+                </p>
+                <button class="report-btn" id="getReportBtn">
+                    <i class="fas fa-file-pdf"></i> Get Detailed Comparison Report
+                </button>
+                <p style="color: var(--gray); font-size: 1rem; margin-top: 10px;">
+                    Includes amortization tables and personalized analysis
+                </p>
             </div>
         </div>
     </div>
@@ -861,9 +998,47 @@
             </div>
         </div>
     </div>
+    
+    <!-- Report Modal -->
+    <div class="report-modal" id="reportModal">
+        <div class="report-modal-content">
+            <h3 class="report-modal-title"><i class="fas fa-file-pdf"></i> Get Detailed Report</h3>
+            
+            <div class="report-info">
+                <i class="fas fa-info-circle"></i>
+                Enter your details to receive a comprehensive loan comparison report
+            </div>
+            
+            <div class="report-form-group">
+                <label for="reportName"><i class="fas fa-user"></i> Full Name</label>
+                <input type="text" id="reportName" placeholder="Enter your full name" required>
+            </div>
+            
+            <div class="report-form-group">
+                <label for="reportEmail"><i class="fas fa-envelope"></i> Email Address</label>
+                <input type="email" id="reportEmail" placeholder="Enter your email" required>
+            </div>
+            
+            <div class="report-form-group">
+                <label for="reportMobile"><i class="fas fa-phone"></i> Mobile Number</label>
+                <input type="tel" id="reportMobile" placeholder="Enter your mobile number" required>
+            </div>
 
-    <!-- Notification -->
-    <div class="notification" id="notification">
+            <div class="report-form-group">
+                <label for="reportMessage"><i class="fas fa-comment-dots"></i> Message / Enquiry</label>
+                <textarea id="reportMessage" placeholder="Enter your enquiry or message" rows="3" style="width:100%;padding:14px 18px;border:2px solid #e2e8f0;border-radius:10px;font-size:1.1rem;resize:vertical;"></textarea>
+            </div>
+            
+            <div class="report-actions">
+                <button class="btn btn-outline" id="cancelReport">Cancel</button>
+                <button class="btn btn-warning" id="generateReportBtn">
+                    <i class="fas fa-file-pdf"></i> Generate Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->    <div class="notification" id="notification">
         <i class="fas fa-check-circle"></i>
         <span>Loan details updated successfully!</span>
     </div>
@@ -873,6 +1048,9 @@
     </footer>
 
     <script>
+        // Initialize EmailJS (replace with your actual user ID)
+        emailjs.init('DgCSv9kz_Ufe0mgE6'); // <-- Replace with your EmailJS user ID
+
         // DOM Elements
         const notification = document.getElementById('notification');
         const resultAlert = document.getElementById('resultAlert');
@@ -889,8 +1067,12 @@
         const loanOption2Card = document.getElementById('loanOption2');
         const syncNotice1 = document.getElementById('syncNotice1');
         const body = document.body;
+        const getReportBtn = document.getElementById('getReportBtn');
+        const reportModal = document.getElementById('reportModal');
+        const cancelReport = document.getElementById('cancelReport');
+        const generateReportBtn = document.getElementById('generateReportBtn');
         
-        // Loan options for comparison - all set to 0
+        // Loan options for comparison
         let loanOption1 = {
             amount: 0,
             rate: 0,
@@ -918,10 +1100,348 @@
             saveLoanChanges.addEventListener('click', saveLoanChangesHandler);
             editLoan1Btn.addEventListener('click', () => openEditLoanModal(1));
             editLoan2Btn.addEventListener('click', () => openEditLoanModal(2));
+            getReportBtn.addEventListener('click', openReportModal);
+            cancelReport.addEventListener('click', closeReportModal);
+            generateReportBtn.addEventListener('click', generateReport);
             
             // Update comparison page with initial data
             updateComparisonPage();
         });
+        
+        // Open report modal
+        function openReportModal() {
+            if (loanOption1.amount === 0 || loanOption2.amount === 0) {
+                showNotification('Please enter loan details first');
+                return;
+            }
+            reportModal.classList.add('active');
+        }
+        
+        // Close report modal
+        function closeReportModal() {
+            reportModal.classList.remove('active');
+        }
+        
+        // Generate and download/send report
+        function generateReport() {
+            const name = document.getElementById('reportName').value;
+            const email = document.getElementById('reportEmail').value;
+            const mobile = document.getElementById('reportMobile').value;
+            const message = document.getElementById('reportMessage').value;
+
+            if (!name || !email || !mobile) {
+                showNotification('Please fill all fields');
+                return;
+            }
+
+            // Generate PDF report as Blob and Base64
+            createPdfReport(name, email, mobile, function(pdfBlob, pdfBase64) {
+                // Download the PDF locally
+                const url = URL.createObjectURL(pdfBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Loan_Comparison_Report_${new Date().getTime()}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+
+                // 1. Send user details to admin (you)
+                emailjs.send('service_gc6yiyh', 'template_2ppcayw', {
+                    from_name: name,
+                    from_email: email,
+                    from_mobile: mobile,
+                    message: message
+                }).then(function(response) {
+                    // 2. Auto-reply to user with PDF attached
+                    emailjs.send('service_gc6yiyh', 'template_pwylw7i', {
+                        to_name: name,
+                        to_email: email,
+                        title: 'Loan Comparison Report',
+                        message: 'Please find your detailed loan comparison report attached.',
+                        user_message: message, 
+                        attachment: "data:application/pdf;base64," + pdfBase64
+                    }).then(function(response) {
+                        showNotification('Report sent to your email!');
+                        closeReportModal();
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000); // 1 second delay for user to see notification
+                    }, function(error) {
+                        console.error('EmailJS error:', error); // <--- ADD THIS LINE
+                        showNotification('Failed to send report to user. Please try again.');
+                    });
+                }, function(error) {
+                    showNotification('Failed to send user details to admin.');
+                });
+            });
+        }
+
+        // Create PDF report and return both Blob and Base64
+        function createPdfReport(name, email, mobile, callback) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Add header
+            doc.setFontSize(22);
+            doc.setTextColor(67, 97, 238);
+            doc.text('Loan Comparison Report', 105, 20, null, null, 'center');
+
+            doc.setFontSize(12);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 28, null, null, 'center');
+
+            // Add user details
+            doc.setFontSize(14);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Personal Details', 20, 40);
+
+            doc.setFontSize(12);
+            doc.text(`Name: ${name}`, 20, 48);
+            doc.text(`Email: ${email}`, 20, 56);
+            doc.text(`Mobile: ${mobile}`, 20, 64);
+
+            // Add loan details section
+            doc.setFontSize(14);
+            doc.text('Loan Comparison Summary', 20, 80);
+
+            // Calculate totals
+            const totalInterest1 = calculateTotalInterest(loanOption1.amount, loanOption1.rate, loanOption1.tenureMonths, loanOption1.emi);
+            const totalPayment1 = loanOption1.amount + totalInterest1;
+
+            const totalInterest2 = calculateTotalInterest(loanOption2.amount, loanOption2.rate, loanOption2.tenureMonths, loanOption2.emi);
+            const totalPayment2 = loanOption2.amount + totalInterest2;
+
+            // Format tenure
+            const formatTenure = (months) => {
+                if (months <= 0) return "0 months";
+                const years = Math.floor(months / 12);
+                const remainingMonths = months % 12;
+                let display = "";
+                if (years > 0) display += `${years} year${years > 1 ? 's' : ''}`;
+                if (remainingMonths > 0) {
+                    if (years > 0) display += " ";
+                    display += `${remainingMonths} month${remainingMonths > 1 ? 's' : ''}`;
+                }
+                return display;
+            };
+
+            // Create loan details table
+            const loanData = [
+                ['', 'Alternative Loan', 'Current Loan'],
+                ['Loan Amount', `₹${formatNumber(loanOption1.amount)}`, `₹${formatNumber(loanOption2.amount)}`],
+                ['Interest Rate', `${loanOption1.rate.toFixed(2)}%`, `${loanOption2.rate.toFixed(2)}%`],
+                ['Loan Tenure', formatTenure(loanOption1.tenureMonths), formatTenure(loanOption2.tenureMonths)],
+                ['Monthly EMI', `₹${formatNumber(loanOption1.emi)}`, `₹${formatNumber(loanOption2.emi)}`],
+                ['Total Interest', `₹${formatNumber(totalInterest1)}`, `₹${formatNumber(totalInterest2)}`],
+                ['Total Payment', `₹${formatNumber(totalPayment1)}`, `₹${formatNumber(totalPayment2)}`]
+            ];
+            
+            doc.autoTable({
+                startY: 90,
+                head: [loanData[0]],
+                body: loanData.slice(1),
+                theme: 'grid',
+                headStyles: { fillColor: [67, 97, 238], textColor: 255 },
+                styles: { fontSize: 10 }
+            });
+            
+            // Add advantages/disadvantages section
+            const prosCons1 = getProsCons(loanOption1, loanOption2, totalInterest1, totalInterest2);
+            const prosCons2 = getProsCons(loanOption2, loanOption1, totalInterest2, totalInterest1);
+            
+            let yPos = doc.autoTable.previous.finalY + 15;
+            doc.setFontSize(14);
+            doc.text('Advantages & Disadvantages', 20, yPos);
+            
+            yPos += 10;
+            doc.setFontSize(12);
+            doc.setTextColor(46, 196, 182);
+            doc.text('Alternative Loan', 20, yPos);
+            
+            yPos += 7;
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Advantages:', 25, yPos);
+            
+            prosCons1.pros.forEach((pro, i) => {
+                yPos += 7;
+                doc.text(`✓ ${pro}`, 30, yPos);
+            });
+            
+            yPos += 10;
+            doc.setTextColor(231, 29, 54);
+            doc.text('Disadvantages:', 25, yPos);
+            
+            prosCons1.cons.forEach((con, i) => {
+                yPos += 7;
+                doc.text(`✗ ${con}`, 30, yPos);
+            });
+            
+            yPos += 15;
+            doc.setFontSize(12);
+            doc.setTextColor(46, 196, 182);
+            doc.text('Current Loan', 20, yPos);
+            
+            yPos += 7;
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Advantages:', 25, yPos);
+            
+            prosCons2.pros.forEach((pro, i) => {
+                yPos += 7;
+                doc.text(`✓ ${pro}`, 30, yPos);
+            });
+            
+            yPos += 10;
+            doc.setTextColor(231, 29, 54);
+            doc.text('Disadvantages:', 25, yPos);
+            
+            prosCons2.cons.forEach((con, i) => {
+                yPos += 7;
+                doc.text(`✗ ${con}`, 30, yPos);
+            });
+            
+            // Add amortization tables
+            doc.addPage();
+            doc.setFontSize(14);
+            doc.setTextColor(67, 97, 238);
+            doc.text('Amortization Schedule - Alternative Loan', 20, 20);
+            
+            const amortization1 = generateAmortizationSchedule(loanOption1);
+            const amortizationTable1 = amortization1.map(month => [
+                month.month,
+                `₹${formatNumber(month.openingBalance)}`,
+                `₹${formatNumber(month.emi)}`,
+                `₹${formatNumber(month.principal)}`,
+                `₹${formatNumber(month.interest)}`,
+                `₹${formatNumber(month.closingBalance)}`
+            ]);
+            
+            doc.autoTable({
+                startY: 30,
+                head: [['Month', 'Opening Balance', 'EMI', 'Principal', 'Interest', 'Closing Balance']],
+                body: amortizationTable1,
+                theme: 'grid',
+                headStyles: { fillColor: [67, 97, 238], textColor: 255 },
+                styles: { fontSize: 8 },
+                pageBreak: 'auto'
+            });
+            
+            doc.addPage();
+            doc.setFontSize(14);
+            doc.setTextColor(67, 97, 238);
+            doc.text('Amortization Schedule - Current Loan', 20, 20);
+            
+            const amortization2 = generateAmortizationSchedule(loanOption2);
+            const amortizationTable2 = amortization2.map(month => [
+                month.month,
+                `₹${formatNumber(month.openingBalance)}`,
+                `₹${formatNumber(month.emi)}`,
+                `₹${formatNumber(month.principal)}`,
+                `₹${formatNumber(month.interest)}`,
+                `₹${formatNumber(month.closingBalance)}`
+            ]);
+            
+            doc.autoTable({
+                startY: 30,
+                head: [['Month', 'Opening Balance', 'EMI', 'Principal', 'Interest', 'Closing Balance']],
+                body: amortizationTable2,
+                theme: 'grid',
+                headStyles: { fillColor: [67, 97, 238], textColor: 255 },
+                styles: { fontSize: 8 }
+            });
+            
+            // Add footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                doc.text(`Page ${i} of ${pageCount}`, 105, 285, null, null, 'center');
+                doc.text('© 2025 Loanitol | Detailed Loan Comparison Report', 105, 290, null, null, 'center');
+            }
+
+            // Output PDF as Blob and Base64 for EmailJS
+            doc.save = function() {}; // Prevent auto-download
+            const pdfBlob = doc.output('blob');
+            const pdfBase64 = doc.output('datauristring').split(',')[1];
+
+            if (typeof callback === 'function') {
+                callback(pdfBlob, pdfBase64);
+            }
+        }
+        
+        // Generate amortization schedule
+        function generateAmortizationSchedule(loan) {
+            const schedule = [];
+            let balance = loan.amount;
+            const monthlyRate = loan.rate / 12 / 100;
+            const emi = loan.emi;
+            
+            for (let i = 0; i < loan.tenureMonths; i++) {
+                const interest = balance * monthlyRate;
+                const principal = emi - interest;
+                const closingBalance = balance - principal;
+                
+                schedule.push({
+                    month: i+1,
+                    openingBalance: balance,
+                    emi: emi,
+                    principal: principal,
+                    interest: interest,
+                    closingBalance: closingBalance
+                });
+                
+                balance = closingBalance;
+                
+                // Break if balance becomes zero or negative
+                if (balance <= 0) {
+                    break;
+                }
+            }
+            
+            return schedule;
+        }
+        
+        // Get pros and cons for a loan
+        function getProsCons(loan, otherLoan, totalInterest, otherTotalInterest) {
+            const pros = [];
+            const cons = [];
+            
+            // Compare EMI
+            if (loan.emi < otherLoan.emi) {
+                pros.push("Lower monthly EMI");
+            } else if (loan.emi > otherLoan.emi) {
+                cons.push("Higher monthly EMI");
+            }
+            
+            // Compare total interest
+            if (totalInterest < otherTotalInterest) {
+                pros.push("Lower total interest");
+            } else if (totalInterest > otherTotalInterest) {
+                cons.push("Higher total interest");
+            }
+            
+            // Compare tenure
+            if (loan.tenureMonths < otherLoan.tenureMonths) {
+                pros.push("Shorter repayment period");
+            } else if (loan.tenureMonths > otherLoan.tenureMonths) {
+                cons.push("Longer repayment period");
+            }
+            
+            // If no pros or cons, add a message
+            if (pros.length === 0) {
+                pros.push("No significant advantages identified");
+            }
+            if (cons.length === 0) {
+                cons.push("No significant disadvantages identified");
+            }
+            
+            return { pros, cons };
+        }
         
         // Update comparison page with loan data
         function updateComparisonPage() {
@@ -948,7 +1468,7 @@
                 return display;
             };
             
-            // Update Option 1 (Current Loan)
+            // Update Option 1 (Alternative Loan)
             document.getElementById('opt1Amount').textContent = `₹${formatNumber(loanOption1.amount)}`;
             document.getElementById('opt1Rate').textContent = `${loanOption1.rate.toFixed(2)}%`;
             document.getElementById('opt1Tenure').textContent = formatTenure(loanOption1.tenureMonths);
@@ -1028,34 +1548,32 @@
                 `;
             }
             
-            // Update comparison results
+            // Get all difference elements
             const emiDiffElement = document.querySelectorAll('.difference')[0];
             const interestDiffElement = document.querySelectorAll('.difference')[1];
             const tenureDiffElement = document.querySelectorAll('.difference')[2];
             const totalDiffElement = document.querySelectorAll('.difference')[3];
             
-            // Set styles based on savings/loss
-            const emiClass = emiDiff < 0 ? "positive" : "negative";
-            const interestClass = interestDiff < 0 ? "positive" : "negative";
-            const tenureClass = tenureDiff < 0 ? "negative" : "positive";
-            const totalClass = totalSavings < 0 ? "positive" : "negative";
-            
-            // Set content
+            // UPDATED: Use actual signs for differences
+            // EMI Difference: + when alternative EMI > current EMI
             emiDiffElement.innerHTML = emiDiff === 0 ? 
-                `<span>₹0/month</span>` :
-                `<span class="${emiClass}">${emiDiff < 0 ? '+' : ''}₹${formatNumber(Math.abs(emiDiff))}/month</span>`;
+                `<span>₹0 /month</span>` :
+                `<span class="${emiDiff < 0 ? 'positive' : 'negative'}">${emiDiff >= 0 ? '+' : '-'}₹${formatNumber(Math.abs(emiDiff))} /month</span>`;
                 
+            // Interest Difference: show actual sign
             interestDiffElement.innerHTML = interestDiff === 0 ?
                 `<span>₹0</span>` :
-                `<span class="${interestClass}">${interestDiff < 0 ? '+' : ''}₹${formatNumber(Math.abs(interestDiff))}</span>`;
+                `<span class="${interestDiff < 0 ? 'positive' : 'negative'}">${interestDiff < 0 ? '+' : ''}₹${formatNumber(Math.abs(interestDiff))}</span>`;
                 
+            // UPDATED: Tenure Difference: + when alternative tenure > current tenure
             tenureDiffElement.innerHTML = tenureDiff === 0 ?
                 `<span>0 months</span>` :
-                `<span class="${tenureClass}">${tenureDiff > 0 ? '+' : ''}${Math.abs(tenureDiff)} months</span>`;
+                `<span class="${tenureDiff < 0 ? 'positive' : 'negative'}">${tenureDiff >= 0 ? '+' : '-'}${Math.abs(tenureDiff)} months</span>`;
                 
+            // Total Savings/Loss
             totalDiffElement.innerHTML = totalSavings === 0 ?
                 `<span>₹0</span>` :
-                `<span class="${totalClass}">${totalSavings < 0 ? '+' : ''}₹${formatNumber(Math.abs(totalSavings))}</span>`;
+                `<span class="${totalSavings < 0 ? 'positive' : 'negative'}">${totalSavings < 0 ? '+' : ''}₹${formatNumber(Math.abs(totalSavings))}</span>`;
             
             // Update labels based on savings/loss
             const totalLabel = totalSavings < 0 ? "Total Savings:" : "Total Loss:";
@@ -1078,7 +1596,6 @@
                 document.getElementById('editTenureValue').value = Math.floor(loan.tenureMonths / 12);
                 document.getElementById('editYears').checked = true;
             } else if (loan.tenureMonths > 0) {
-                document.getElementById('editTenureValue').value = loan.tenureMonths;
                 document.getElementById('editMonths').checked = true;
             } else {
                 document.getElementById('editTenureValue').value = 0;
@@ -1086,7 +1603,7 @@
             }
             
             // Update modal title
-            loanModalTitle.textContent = `Edit ${loanId === 1 ? 'Current' : 'Alternative'} Loan`;
+            loanModalTitle.textContent = `Edit ${loanId === 1 ? 'Alternative' : 'Current'} Loan`;
             
             // Show modal
             loanEditModal.classList.add('active');
