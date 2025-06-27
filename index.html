@@ -1162,7 +1162,7 @@
                         title: 'Loan Comparison Report', // <-- Add this line
                         message: 'Please find your detailed loan comparison report attached.',
                         user_message: message, 
-                        
+                        attachment: "data:application/pdf;base64," + pdfBase64
                     }).then(function(response) {
                         showNotification('Report sent to your email!');
                         closeReportModal();
