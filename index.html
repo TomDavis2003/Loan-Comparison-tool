@@ -1133,24 +1133,6 @@
                 showNotification('Please fill all fields');
                 return;
             }
-            // ADD THIS BLOCK HERE (replace YOUR_WEB_APP_URL with your actual URL)
-            fetch('https://script.google.com/macros/s/AKfycby237JJ0wZnojOEA6kqUEdc1z4L36-NEoLEC1zJy3v4UxNf2htYBxy4MhPO3XuDKpFhmw/exec', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: name,
-                    email: email,
-                    mobile: mobile,
-                    message: message
-                })
-            })
-            .then(res => res.text())
-            .then(res => {
-                console.log('Google Sheet response:', res);
-            })
-            .catch(err => {
-                console.error('Google Sheet error:', err);
-            });
 
             // Generate PDF report as Blob and Base64
             createPdfReport(name, email, mobile, function(pdfBlob, pdfBase64) {
@@ -1173,32 +1155,24 @@
                     from_mobile: mobile,
                     message: message
                 }).then(function(response) {
-                    // 2. Auto-reply to user with PDF attached (only if small enough)
-                    if (pdfBase64.length < 50000) { // 50KB limit for EmailJS variables
-                        emailjs.send('service_gc6yiyh', 'template_pwylw7i', {
-                            to_name: name,
-                            to_email: email,
-                            title: 'Loan Comparison Report',
-                            message: 'Please find your detailed loan comparison report attached.',
-                            user_message: message, 
-                            attachment: "data:application/pdf;base64," + pdfBase64
-                        }).then(function(response) {
-                            showNotification('Report sent to your email!');
-                            closeReportModal();
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1000);
-                        }, function(error) {
-                            console.error('EmailJS error:', error);
-                            showNotification('Failed to send report to user. Please try again.');
-                        });
-                    } else {
-                        showNotification('Report is too large to send by email. Please download it manually.');
+                    // 2. Auto-reply to user with PDF attached
+                    emailjs.send('service_gc6yiyh', 'template_pwylw7i', {
+                        to_name: name,
+                        to_email: email,
+                        title: 'Loan Comparison Report',
+                        message: 'Please find your detailed loan comparison report attached.',
+                        user_message: message, 
+                        attachment: "data:application/pdf;base64," + pdfBase64
+                    }).then(function(response) {
+                        showNotification('Report sent to your email!');
                         closeReportModal();
                         setTimeout(() => {
                             window.location.reload();
-                        }, 2000);
-                    }
+                        }, 1000);
+                    }, function(error) {
+                        console.error('EmailJS error:', error); // <--- ADD THIS LINE
+                        showNotification('Failed to send report to user. Please try again.');
+                    });
                 }, function(error) {
                     showNotification('Failed to send user details to admin.');
                 });
@@ -1280,57 +1254,106 @@
             
             let yPos = doc.autoTable.previous.finalY + 15;
             doc.setFontSize(14);
-            doc.setTextColor(67, 97, 238);
             doc.text('Advantages & Disadvantages', 20, yPos);
-
+            
             yPos += 10;
             doc.setFontSize(12);
             doc.setTextColor(46, 196, 182);
             doc.text('Alternative Loan', 20, yPos);
-
+            
             yPos += 7;
             doc.setFontSize(10);
             doc.setTextColor(0, 0, 0);
             doc.text('Advantages:', 25, yPos);
-
+            
             prosCons1.pros.forEach((pro, i) => {
                 yPos += 7;
                 doc.text(`✓ ${pro}`, 30, yPos);
             });
-
+            
             yPos += 10;
             doc.setTextColor(231, 29, 54);
             doc.text('Disadvantages:', 25, yPos);
-
+            
             prosCons1.cons.forEach((con, i) => {
                 yPos += 7;
                 doc.text(`✗ ${con}`, 30, yPos);
             });
-
+            
             yPos += 15;
             doc.setFontSize(12);
             doc.setTextColor(46, 196, 182);
             doc.text('Current Loan', 20, yPos);
-
+            
             yPos += 7;
             doc.setFontSize(10);
             doc.setTextColor(0, 0, 0);
             doc.text('Advantages:', 25, yPos);
-
+            
             prosCons2.pros.forEach((pro, i) => {
                 yPos += 7;
                 doc.text(`✓ ${pro}`, 30, yPos);
             });
-
+            
             yPos += 10;
             doc.setTextColor(231, 29, 54);
             doc.text('Disadvantages:', 25, yPos);
-
+            
             prosCons2.cons.forEach((con, i) => {
                 yPos += 7;
                 doc.text(`✗ ${con}`, 30, yPos);
             });
-
+            
+            // Add amortization tables
+            doc.addPage();
+            doc.setFontSize(14);
+            doc.setTextColor(67, 97, 238);
+            doc.text('Amortization Schedule - Alternative Loan', 20, 20);
+            
+            const amortization1 = generateAmortizationSchedule(loanOption1);
+            const amortizationTable1 = amortization1.map(month => [
+                month.month,
+                `₹${formatNumber(month.openingBalance)}`,
+                `₹${formatNumber(month.emi)}`,
+                `₹${formatNumber(month.principal)}`,
+                `₹${formatNumber(month.interest)}`,
+                `₹${formatNumber(month.closingBalance)}`
+            ]);
+            
+            doc.autoTable({
+                startY: 30,
+                head: [['Month', 'Opening Balance', 'EMI', 'Principal', 'Interest', 'Closing Balance']],
+                body: amortizationTable1,
+                theme: 'grid',
+                headStyles: { fillColor: [67, 97, 238], textColor: 255 },
+                styles: { fontSize: 8 },
+                pageBreak: 'auto'
+            });
+            
+            doc.addPage();
+            doc.setFontSize(14);
+            doc.setTextColor(67, 97, 238);
+            doc.text('Amortization Schedule - Current Loan', 20, 20);
+            
+            const amortization2 = generateAmortizationSchedule(loanOption2);
+            const amortizationTable2 = amortization2.map(month => [
+                month.month,
+                `₹${formatNumber(month.openingBalance)}`,
+                `₹${formatNumber(month.emi)}`,
+                `₹${formatNumber(month.principal)}`,
+                `₹${formatNumber(month.interest)}`,
+                `₹${formatNumber(month.closingBalance)}`
+            ]);
+            
+            doc.autoTable({
+                startY: 30,
+                head: [['Month', 'Opening Balance', 'EMI', 'Principal', 'Interest', 'Closing Balance']],
+                body: amortizationTable2,
+                theme: 'grid',
+                headStyles: { fillColor: [67, 97, 238], textColor: 255 },
+                styles: { fontSize: 8 }
+            });
+            
             // Add footer
             const pageCount = doc.internal.getNumberOfPages();
             for (let i = 1; i <= pageCount; i++) {
@@ -1630,13 +1653,10 @@
             // Auto-sync loan amount to other loan if it hasn't been edited yet
             if (!otherLoan.edited && otherLoan.amount === 0) {
                 otherLoan.amount = amount;
-                const syncNotice = document.getElementById(`syncNotice${currentEditLoan}`);
-                if (syncNotice) {
-                    syncNotice.classList.add('show');
-                    setTimeout(() => {
-                        syncNotice.classList.remove('show');
-                    }, 3000);
-                }
+                document.getElementById(`syncNotice${currentEditLoan}`).classList.add('show');
+                setTimeout(() => {
+                    document.getElementById(`syncNotice${currentEditLoan}`).classList.remove('show');
+                }, 3000);
             }
             
             // Calculate missing parameter
